@@ -5,6 +5,7 @@ import com.github.jhchee.moneylionfeatureswitches.model.Feature;
 import com.github.jhchee.moneylionfeatureswitches.model.User;
 import com.github.jhchee.moneylionfeatureswitches.repository.IFeatureRepo;
 import com.github.jhchee.moneylionfeatureswitches.repository.IUserRepo;
+import com.github.jhchee.moneylionfeatureswitches.viewModel.SwitchRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -55,8 +57,7 @@ public class FeatureSwitchControllerTest {
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.canAccess").value(true))
-                .andReturn();
+                .andExpect(jsonPath("$.canAccess").value(true));
 
     }
 
@@ -78,9 +79,93 @@ public class FeatureSwitchControllerTest {
         ).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.canAccess").value(false))
-                .andReturn();
+                .andExpect(jsonPath("$.canAccess").value(false));
 
     }
 
+    @Test
+    void givenSwitchIsOff_whenEnablingSwitch_thenReturnsUpdateSuccess() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        User user = new User(1, email);
+        Feature feature = new Feature(1, feature_name);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(user);
+        when(featureRepository.findFeatureByName(feature_name)).thenReturn(feature);
+
+        SwitchRequest request = new SwitchRequest(email, feature_name, true);
+
+        mockMvc.perform(
+                post("/feature")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenSwitchIsOn_whenDisablingSwitch_thenReturnsUpdateSuccess() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        User user = new User(1, email);
+        Feature feature = new Feature(1, feature_name);
+        user.getFeatures().add(feature);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(user);
+        when(featureRepository.findFeatureByName(feature_name)).thenReturn(feature);
+
+        SwitchRequest request = new SwitchRequest(email, feature_name, false);
+
+        mockMvc.perform(
+                post("/feature")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenSwitchIsOn_whenEnablingSwitch_thenReturnsNotModified() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        User user = new User(1, email);
+        Feature feature = new Feature(1, feature_name);
+        user.getFeatures().add(feature);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(user);
+        when(featureRepository.findFeatureByName(feature_name)).thenReturn(feature);
+
+        SwitchRequest request = new SwitchRequest(email, feature_name, true);
+
+        mockMvc.perform(
+                post("/feature")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andDo(print())
+                .andExpect(status().isNotModified());
+    }
+
+    @Test
+    void givenSwitchIsOff_whenDisablingSwitch_thenReturnsNotModified() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        User user = new User(1, email);
+        Feature feature = new Feature(1, feature_name);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(user);
+        when(featureRepository.findFeatureByName(feature_name)).thenReturn(feature);
+
+        SwitchRequest request = new SwitchRequest(email, feature_name, false);
+
+        mockMvc.perform(
+                post("/feature")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andDo(print())
+                .andExpect(status().isNotModified());
+    }
 }
