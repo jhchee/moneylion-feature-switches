@@ -1,5 +1,7 @@
 package com.github.jhchee.moneylionfeatureswitches.controller;
 
+import com.github.jhchee.moneylionfeatureswitches.model.Feature;
+import com.github.jhchee.moneylionfeatureswitches.model.User;
 import com.github.jhchee.moneylionfeatureswitches.repository.IFeatureRepo;
 import com.github.jhchee.moneylionfeatureswitches.repository.IUserRepo;
 import com.github.jhchee.moneylionfeatureswitches.viewModel.SwitchRequest;
@@ -18,7 +20,18 @@ public class FeatureSwitchController {
 
     @GetMapping
     public SwitchResponse getSwitchStatus(@RequestParam String email, @RequestParam String featureName) {
-        // TODO: get switch status from user table with email, feature name
+        User user = userRepository.findUserByEmail(email);
+        Feature feature = featureRepository.findFeatureByName(featureName);
+
+        SwitchResponse response = new SwitchResponse(false);
+
+        if (user != null && feature != null) {
+            // the switch is on if it exists in the user_feature table
+            boolean canAccess = user.getFeatures().contains(feature);
+            response.setCanAccess(canAccess);
+        }
+
+        return response;
     }
 
     @PostMapping

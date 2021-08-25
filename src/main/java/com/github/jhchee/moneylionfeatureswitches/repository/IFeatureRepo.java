@@ -5,4 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface IFeatureRepo extends CrudRepository<Feature, Integer> {
 
+    Feature findFeatureByName(String name);
 }

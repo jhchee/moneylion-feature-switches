@@ -15,6 +15,7 @@ public class User {
     String email;
 
     // a table that stores unique pairs of user and feature
+    // the existence of user_feature pair means the feature switch is on
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_feature",
             joinColumns = {
@@ -25,6 +26,15 @@ public class User {
             }
     )
     private Set<Feature> features = new HashSet<>();
+
+    public User(Integer id, String email) {
+        this.id = id;
+        this.email = email;
+    }
+
+    public User() {
+
+    }
 
     public String getEmail() {
         return email;

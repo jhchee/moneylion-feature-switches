@@ -13,6 +13,15 @@ public class Feature {
 
     String name;
 
+    public Feature(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Feature() {
+
+    }
+
     public long getId() {
         return id;
     }
