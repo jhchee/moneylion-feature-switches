@@ -1,5 +1,6 @@
 package com.github.jhchee.moneylionfeatureswitches.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jhchee.moneylionfeatureswitches.model.Feature;
 import com.github.jhchee.moneylionfeatureswitches.model.User;
 import com.github.jhchee.moneylionfeatureswitches.repository.IFeatureRepo;
@@ -25,15 +26,17 @@ public class FeatureSwitchControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private IUserRepo userRepository;
 
     @MockBean
     private IFeatureRepo featureRepository;
 
-
     @Test
-    void givenSwitchExist_whenGetStatus_thenReturnsCanAccess() throws Exception {
+    void givenSwitchIsOn_whenGetStatus_thenReturnsCanAccess() throws Exception {
         String email = "random@mail.com";
         String feature_name = "random_feature";
 
@@ -53,6 +56,29 @@ public class FeatureSwitchControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.canAccess").value(true))
+                .andReturn();
+
+    }
+
+    @Test
+    void givenSwitchIsOff_whenGetStatus_thenReturnsCannotAccess() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        User user = new User(1, email);
+        Feature feature = new Feature(1, feature_name);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(user);
+        when(featureRepository.findFeatureByName(feature_name)).thenReturn(feature);
+
+        mockMvc.perform(
+                get("/feature")
+                        .param("email", email)
+                        .param("featureName", feature_name)
+        ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.canAccess").value(false))
                 .andReturn();
 
     }
