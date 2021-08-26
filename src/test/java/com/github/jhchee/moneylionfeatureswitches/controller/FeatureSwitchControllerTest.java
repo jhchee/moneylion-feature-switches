@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,6 +84,22 @@ public class FeatureSwitchControllerTest {
     }
 
     @Test
+    void givenUserAndFeatureAreAbsent_whenGetStatus_thenReturnsCannotAccess() throws Exception {
+        String email = "random@mail.com";
+        String feature_name = "random_feature";
+
+        mockMvc.perform(
+                get("/feature")
+                        .param("email", email)
+                        .param("featureName", feature_name)
+        ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.canAccess").value(false));
+
+    }
+
+    @Test
     void givenSwitchIsOff_whenEnablingSwitch_thenReturnsUpdateSuccess() throws Exception {
         String email = "random@mail.com";
         String feature_name = "random_feature";
@@ -102,6 +118,9 @@ public class FeatureSwitchControllerTest {
                         .content(objectMapper.writeValueAsString(request))
         ).andDo(print())
                 .andExpect(status().isOk());
+
+        // user feature is modified
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
@@ -124,6 +143,9 @@ public class FeatureSwitchControllerTest {
                         .content(objectMapper.writeValueAsString(request))
         ).andDo(print())
                 .andExpect(status().isOk());
+
+        // user feature is modified
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
@@ -146,6 +168,9 @@ public class FeatureSwitchControllerTest {
                         .content(objectMapper.writeValueAsString(request))
         ).andDo(print())
                 .andExpect(status().isNotModified());
+
+        // no resource is modified
+        verify(userRepository, times(0)).save(any());
     }
 
     @Test
@@ -167,5 +192,8 @@ public class FeatureSwitchControllerTest {
                         .content(objectMapper.writeValueAsString(request))
         ).andDo(print())
                 .andExpect(status().isNotModified());
+
+        // no resource is modified
+        verify(userRepository, times(0)).save(any());
     }
 }
