@@ -1,11 +1,14 @@
 package com.github.jhchee.moneylionfeatureswitches.controller;
 
+import com.github.jhchee.moneylionfeatureswitches.MoneylionFeatureSwitchesApplication;
 import com.github.jhchee.moneylionfeatureswitches.model.Feature;
 import com.github.jhchee.moneylionfeatureswitches.model.User;
 import com.github.jhchee.moneylionfeatureswitches.repository.IFeatureRepo;
 import com.github.jhchee.moneylionfeatureswitches.repository.IUserRepo;
 import com.github.jhchee.moneylionfeatureswitches.viewModel.SwitchRequest;
 import com.github.jhchee.moneylionfeatureswitches.viewModel.SwitchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,8 @@ public class FeatureSwitchController {
 
     @Autowired
     private IFeatureRepo featureRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(MoneylionFeatureSwitchesApplication.class);
 
     @GetMapping
     public SwitchResponse getSwitchStatus(@RequestParam String email, @RequestParam String featureName) {
@@ -75,5 +80,7 @@ public class FeatureSwitchController {
         }
 
         userRepository.save(user);
+
+        logger.info("Switch feature: {} '{}' to '{}' for user with email: {}", featureName, !isEnable, isEnable, user.getEmail());
     }
 }
