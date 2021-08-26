@@ -1,5 +1,6 @@
 package com.github.jhchee.moneylionfeatureswitches.controller;
 
+import com.github.jhchee.Util.Utils;
 import com.github.jhchee.moneylionfeatureswitches.MoneylionFeatureSwitchesApplication;
 import com.github.jhchee.moneylionfeatureswitches.model.Feature;
 import com.github.jhchee.moneylionfeatureswitches.model.User;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/feature")
 public class FeatureSwitchController {
@@ -27,6 +30,11 @@ public class FeatureSwitchController {
 
     @GetMapping
     public SwitchResponse getSwitchStatus(@RequestParam String email, @RequestParam String featureName) {
+
+        if (!Utils.isValidEmail(email) || Utils.isNullOrEmpty(featureName)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter format.");
+        }
+
         User user = userRepository.findUserByEmail(email);
         Feature feature = featureRepository.findFeatureByName(featureName);
 
@@ -42,7 +50,7 @@ public class FeatureSwitchController {
     }
 
     @PostMapping
-    public void updateSwitchStatus(@RequestBody SwitchRequest switchRequest) {
+    public void updateSwitchStatus(@Valid @RequestBody SwitchRequest switchRequest) {
         String email = switchRequest.getEmail();
         String featureName = switchRequest.getFeatureName();
         boolean isEnable = switchRequest.isEnable();

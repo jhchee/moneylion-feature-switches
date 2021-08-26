@@ -196,4 +196,24 @@ public class FeatureSwitchControllerTest {
         // no resource is modified
         verify(userRepository, times(0)).save(any());
     }
+
+    @Test
+    void givenInvalidEmailOrFeatureName_whenGetStatus_thenReturnsBadRequest() throws Exception {
+        String invalidEmail = "123";
+        String invalidFeatureName = "";
+
+        mockMvc.perform(
+                get("/feature")
+                        .param("email", invalidEmail)
+                        .param("featureName", "valid_name")
+        ).andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                get("/feature")
+                        .param("email", "random@gmail.com")
+                        .param("featureName", invalidFeatureName)
+        ).andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }
