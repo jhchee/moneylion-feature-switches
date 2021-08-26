@@ -1,14 +1,13 @@
 package com.github.jhchee.moneylionfeatureswitches.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Table(name = "feature")
 @Entity
 public class Feature {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     String name;
@@ -24,10 +23,6 @@ public class Feature {
 
     public Feature() {
 
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getName() {
