@@ -54,10 +54,10 @@ public class FeatureSwitchController {
         boolean isSwitchOn = user != null && feature != null && user.getFeatures().contains(feature);
 
         // perform update only if the request to enable is opposite to the current switch status
-        boolean shouldUpdate = isEnable ^ isSwitchOn;
+        boolean willNotModify = isEnable == isSwitchOn;
 
         // return not modified message when it won't be updated
-        if (!shouldUpdate) {
+        if (willNotModify) {
             throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "Resource is not updated.");
         }
 
