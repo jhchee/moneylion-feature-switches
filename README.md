@@ -36,7 +36,7 @@ Build two APIs that can
                 @JoinColumn(name = "feature_id")
         }
 )
-private Set<Feature> features=new HashSet<>();
+private Set<Feature> features = new HashSet<>();
 ```
 
 - This provides us the ability to determine a feature is enabled by checking whether the feature is in the set. <p/>
@@ -51,12 +51,12 @@ user.getFeatures().contains(feature)
 - This happens when the request to change == switch status.
 
 ```java
-boolean isSwitchOn=user!=null&&feature!=null&&user.getFeatures().contains(feature);
+boolean isSwitchOn = user != null && feature != null && user.getFeatures().contains(feature);
 
-boolean willNotModify=isEnable==isSwitchOn;
+boolean willNotModify = isEnable == isSwitchOn;
 
 if (willNotModify) {
-    throw new ResponseStatusException(HttpStatus.NOT_MODIFIED,"Resource is not updated.");
+    throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "Resource is not updated.");
 }
 
 ```
